@@ -1,0 +1,29 @@
+name: Auto-update EPG
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # har ghante run karega
+  workflow_dispatch:
+
+jobs:
+  update-epg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download latest EPG .gz
+        run: |
+          curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
+
+      - name: Uncompress to XML
+        run: |
+          gzip -df epg.xml.gz
+
+      - name: Commit & push XML
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "actions@github.com"
+          git add epg.xml
+          git commit -m "Auto-update EPG $(date)" || echo "No changes"
+          git push
