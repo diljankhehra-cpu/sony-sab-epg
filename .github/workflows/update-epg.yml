@@ -1,6 +1,6 @@
 name: Auto-update EPG
 
-# Trigger: har ghanta + manual
+# Workflow triggers: har ghanta + manual trigger
 on:
   schedule:
     - cron: "0 * * * *"   # every hour
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_PAT }}   # <- must have write access
+          token: ${{ secrets.GH_PAT }}
 
       # Step 2: Download latest EPG
       - name: Download latest EPG
@@ -27,7 +27,13 @@ jobs:
         run: |
           gzip -df epg.xml.gz
 
-      # Step 4: Commit & push XML using PAT
+      # Step 4: Validate XML
+      - name: Validate XML
+        run: |
+          apt-get update && apt-get install -y libxml2-utils
+          xmllint --noout epg.xml
+
+      # Step 5: Commit & push XML using PAT
       - name: Commit & push XML
         run: |
           git config --local user.name "github-actions"
