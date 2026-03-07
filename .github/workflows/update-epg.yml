@@ -1,6 +1,6 @@
 name: Auto-update EPG
 
-# Trigger: har ghanta + manual trigger
+# Workflow triggers: har ghanta + manual trigger
 on:
   schedule:
     - cron: "0 * * * *"   # every hour
@@ -11,28 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # Step 1: Checkout repository using PAT
+      # Step 1: Checkout repo with PAT
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
 
-      # Step 2: Download latest EPG (OTT Navigator compatible)
+      # Step 2: Download latest EPG
       - name: Download latest EPG
         run: |
           curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
 
       # Step 3: Uncompress to XML
       - name: Uncompress to XML
-        run: gzip -df epg.xml.gz
+        run: |
+          gzip -df epg.xml.gz
 
-      # Step 4: Commit & push updated XML
+      # Step 4: Commit & push XML using PAT (with pull --rebase to avoid errors)
       - name: Commit & push XML
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "actions@github.com"
           git add epg.xml
           git commit -m "Auto-update EPG $(date)" || echo "No changes"
+          git pull --rebase https://$GH_PAT@github.com/diljankhehra-cpu/sony-sab-epg.git main
           git push https://$GH_PAT@github.com/diljankhehra-cpu/sony-sab-epg.git HEAD:main
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
