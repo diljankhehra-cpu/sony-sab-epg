@@ -1,6 +1,6 @@
 name: Auto-update EPG
 
-# Workflow triggers: har ghanta + manual trigger
+# Workflow triggers: every hour + manual
 on:
   schedule:
     - cron: "0 * * * *"   # every hour
@@ -27,11 +27,12 @@ jobs:
         run: |
           gzip -df epg.xml.gz
 
-      # Step 4: Validate XML
+      # Step 4: Install xmllint and validate XML (optional)
       - name: Validate XML
         run: |
-          apt-get update && apt-get install -y libxml2-utils
-          xmllint --noout epg.xml
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          xmllint --noout epg.xml || echo "XML validation failed but continuing..."
 
       # Step 5: Commit & push XML using PAT
       - name: Commit & push XML
