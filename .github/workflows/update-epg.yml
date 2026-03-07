@@ -1,6 +1,6 @@
 name: Auto-update EPG
 
-# Workflow triggers: har ghanta + manual trigger
+# Trigger: har ghanta + manual
 on:
   schedule:
     - cron: "0 * * * *"   # every hour
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GH_PAT }}   # <- must have write access
 
       # Step 2: Download latest EPG
       - name: Download latest EPG
