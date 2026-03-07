@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       # Step 2: Download latest EPG .gz
-      - name: Download latest EPG .gz
+      - name: Download latest EPG
         run: |
           curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
 
