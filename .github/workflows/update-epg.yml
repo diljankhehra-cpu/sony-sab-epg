@@ -1,9 +1,9 @@
 name: Auto-update EPG
 
-# Workflow schedule: har ghante run karega + manual trigger
+# Workflow schedule: har ghanta run karega, manual trigger vi possible
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour
+    - cron: '0 * * * *'  # har ghante run
   workflow_dispatch:
 
 jobs:
@@ -15,15 +15,15 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # Step 2: Download latest EPG .gz
-      - name: Download latest EPG
+      # Step 2: Download latest EPG
+      - name: Download latest EPG gzip
         run: |
           curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
 
       # Step 3: Uncompress to XML
       - name: Uncompress to XML
         run: |
-          gzip -df epg.xml.gz
+          gzip -d -f epg.xml.gz
 
       # Step 4: Commit & push XML using PAT
       - name: Commit & push XML
