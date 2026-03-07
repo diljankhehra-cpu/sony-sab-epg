@@ -1,8 +1,9 @@
 name: Auto-update EPG
 
+# Trigger: har ghanta + manual trigger
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0 * * * *"   # every hour
   workflow_dispatch:
 
 jobs:
@@ -10,21 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      # Step 1: Checkout repository using PAT
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
 
+      # Step 2: Download latest EPG (OTT Navigator compatible)
       - name: Download latest EPG
         run: |
           curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
 
+      # Step 3: Uncompress to XML
       - name: Uncompress to XML
-        run: |
-          gzip -df epg.xml.gz
+        run: gzip -df epg.xml.gz
 
-      # Optional XML validation step removed
-
+      # Step 4: Commit & push updated XML
       - name: Commit & push XML
         run: |
           git config --local user.name "github-actions"
