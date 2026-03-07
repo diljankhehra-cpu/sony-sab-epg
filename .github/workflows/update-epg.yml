@@ -1,9 +1,8 @@
 name: Auto-update EPG
 
-# Workflow triggers: har ghanta + manual trigger
 on:
   schedule:
-    - cron: "0 * * * *"   # every hour
+    - cron: "0 * * * *"  # har ghante
   workflow_dispatch:
 
 jobs:
@@ -27,7 +26,7 @@ jobs:
         run: |
           gzip -df epg.xml.gz
 
-      # Step 4: Commit & push XML using PAT (with pull --rebase to avoid errors)
+      # Step 4: Commit & push XML using PAT (with pull --rebase to avoid push errors)
       - name: Commit & push XML
         run: |
           git config --local user.name "github-actions"
