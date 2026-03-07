@@ -1,9 +1,8 @@
 name: Auto-update EPG
 
-# Workflow triggers: every hour + manual
 on:
   schedule:
-    - cron: "0 * * * *"   # every hour
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -11,30 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # Step 1: Checkout repository with PAT
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
 
-      # Step 2: Download latest EPG
       - name: Download latest EPG
         run: |
           curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
 
-      # Step 3: Uncompress to XML
       - name: Uncompress to XML
         run: |
           gzip -df epg.xml.gz
 
-      # Step 4: Install xmllint and validate XML (optional)
-      - name: Validate XML
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libxml2-utils
-          xmllint --noout epg.xml || echo "XML validation failed but continuing..."
+      # Optional XML validation step removed
 
-      # Step 5: Commit & push XML using PAT
       - name: Commit & push XML
         run: |
           git config --local user.name "github-actions"
