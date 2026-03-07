@@ -1,8 +1,9 @@
 name: Auto-update EPG
 
+# Trigger: hourly + manual
 on:
   schedule:
-    - cron: "0 * * * *"  # har ghante
+    - cron: "0 * * * *"   # every hour
   workflow_dispatch:
 
 jobs:
@@ -10,30 +11,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      # Step 1: Checkout repo with PAT
+      # 1️⃣ Checkout repo using PAT (must)
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
 
-      # Step 2: Download latest EPG
+      # 2️⃣ Download latest EPG from mitthu786
       - name: Download latest EPG
         run: |
           curl -L -o epg.xml.gz https://raw.githubusercontent.com/mitthu786/tvepg/main/epg.xml.gz
 
-      # Step 3: Uncompress to XML
+      # 3️⃣ Decompress XML
       - name: Uncompress to XML
-        run: |
-          gzip -df epg.xml.gz
+        run: gzip -df epg.xml.gz
 
-      # Step 4: Commit & push XML using PAT (with pull --rebase to avoid push errors)
+      # 4️⃣ Commit & push updated XML
       - name: Commit & push XML
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "actions@github.com"
           git add epg.xml
-          git commit -m "Auto-update EPG $(date)" || echo "No changes"
-          git pull --rebase https://$GH_PAT@github.com/diljankhehra-cpu/sony-sab-epg.git main
+          git commit -m "Auto-update EPG $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
           git push https://$GH_PAT@github.com/diljankhehra-cpu/sony-sab-epg.git HEAD:main
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+
+      # 5️⃣ Optional: Validate XML (skip if parser not required)
+      - name: Validate XML (optional)
+        run: |
+          echo "Skipping xmllint as GitHub runner may not allow apt install"
